@@ -165,6 +165,8 @@ verbatum_term(V):-verbatum_var(V).
 holds_attrs(V):-var(V),!.
 holds_attrs(V):-verbatum_var(V),!.
 
+
+% move to logicmoo_utils_common.pl? 
 verbatum_var(Var):-var(Var),!,fail.
 verbatum_var('$VAR'(_)).
 verbatum_var('avar'(_)).
