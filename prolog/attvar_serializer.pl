@@ -73,9 +73,11 @@ maybe_must(_).
 
 
 % deserialize_attvars(V,O):- get_varname_list(Vs),!,loop_check(deserialize_attvars(['$variable_names'|Vs], V,O)),!.
+deserialize_attvars(V,O):- \+compound(V),!,O=V.
 deserialize_attvars(V,O):- loop_check(deserialize_attvars([localvs], V,O),V=O),!.
 
 deserialize_attvars(_Vs, V,O):- cyclic_term(V),!,O=V.
+deserialize_attvars(_Vs, V,O):- atomic(V),!,O=V.
 deserialize_attvars(Vs, V,O):- nonvar(O),!,must(deserialize_attvars(Vs, V,M)),!,must(M=O).
 deserialize_attvars(Vs, V,O):- var(V), get_attr(V,vn,N),set_in_vd(Vs,N=V),!,V=O.
 deserialize_attvars(Vs, V,O):- var(V), member(N=VV,Vs),VV==V,put_attr(V,vn,N),!,V=O.

@@ -31,6 +31,7 @@
       variant_i/2,av_comp/2,
       unify_bodies/2.
 
+:- create_prolog_flag(assert_attvars,false,[keep(true)]).
 
 split_attrs(B,true,B0):-var(B),!,B0=call(B).
 split_attrs(call(C),A,B):-!,split_attrs(C,A,B).
@@ -127,4 +128,6 @@ variant_i(A,B):- term_variables(A,AV),AV\==[],
 av_comp(A,B):-oo_get_attrs(A,AA),oo_get_attrs(B,BB),AA=@=BB,!.
 av_comp(A,B):-oo_get_attrs(A,attr(_,_,AB)),!,AB\==[],oo_get_attrs(B,attr(_,_,AB)).
 av_comp(_A,_B):-!.
+
+
 
