@@ -129,5 +129,7 @@ av_comp(A,B):-oo_get_attrs(A,AA),oo_get_attrs(B,BB),AA=@=BB,!.
 av_comp(A,B):-oo_get_attrs(A,attr(_,_,AB)),!,AB\==[],oo_get_attrs(B,attr(_,_,AB)).
 av_comp(_A,_B):-!.
 
+:- fixup_exports.
+
 
 

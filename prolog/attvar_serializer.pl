@@ -107,11 +107,10 @@ put_dyn_attrs(_V,MAV):- must(MAV),!.
 ensure_attr_setup(M):- atom(M),current_predicate(attribute_goals,M:attribute_goals(_,_,_)),!.
 ensure_attr_setup(M):- atom(M),assert_if_new((M:attribute_goals(V,[put_attr(V,M,A)|R],R):- get_attr(V, M,A))).
 
-
 is_term_expanding_in_file(I,_):- var(I),!,fail.
 is_term_expanding_in_file(I,Type):- source_file(_,_),nb_current('$term',CT),(CT==I->Type=term;((CT=(_:-B),B==I,Type=goal))).
 
-system_expanded_attvars(M:goal,_P,I,O):- 
+system_expanded_attvars(M:goal,P,I,O):- var(P),
    \+ is_term_expanding_in_file(I,_),
    \+ lmcache:never_use_attvar_expander(M),
    prolog_load_context(module,LC),
@@ -121,7 +120,7 @@ system_expanded_attvars(M:goal,_P,I,O):-
    system_expanded_attvars(I,O),
    wdmsg(goal_xform(I --> O)).
 
-system_expanded_attvars(M:term,_P,I,CO):- 
+system_expanded_attvars(M:term,P,I,CO):- nonvar(P),
    \+ lmcache:never_use_attvar_expander(M),
    current_prolog_flag(read_attvars,true), 
    \+ current_prolog_flag(xref,true), 
@@ -180,7 +179,7 @@ verbatum_var('avar'(_,_)).
 %
 system_expanded_attvars(I,O):- (var(I);compound(I)),!,loop_check((deserialize_attvars(I,O))),O\=@=I,!.
 
-
+:- fixup_exports.
 
 
 end_of_file.

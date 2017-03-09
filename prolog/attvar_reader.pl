@@ -67,13 +67,5 @@ read_attvars(TF):-
      install_attvar_expander(M);
      uninstall_attvar_expander(M)).
 
+:- fixup_exports.
 
-:- multifile(goal_expansion/4).
-:- dynamic(goal_expansion/4).
-goal_expansion(I,P,O,P):- current_prolog_flag(read_attvars,true), 
-  prolog_load_context(module,M), system_expanded_attvars(M:goal,P,I,O).
-
-:- multifile(term_expansion/4).
-:- dynamic(term_expansion/4).
-term_expansion(I,P,O,P):- current_prolog_flag(read_attvars,true), 
-  prolog_load_context(module,M), system_expanded_attvars(M:term,P,I,O).
