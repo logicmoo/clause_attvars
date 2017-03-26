@@ -1,7 +1,7 @@
 name(clause_attvars).
 title('An alternate interface to the clause database to allow attributed variables to be asserted').
 
-version('1.1.115').
+version('1.1.117').
 download('https://github.com/TeamSPoon/clause_attvars/releases/*.zip').
 
 author( 'Douglas R. Miles', 'logicmoo@gmail.com' ).

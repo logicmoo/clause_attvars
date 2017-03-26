@@ -31,6 +31,7 @@
 
 install_attvar_expander(M):- lmcache:use_attvar_expander(M),!.
 install_attvar_expander(M):-
+  dmsg(install_attvar_expander(M)),
   asserta(lmcache:use_attvar_expander(M)),
   system:multifile(M:term_expansion/4),
   system:module_transparent(M:term_expansion/4),
