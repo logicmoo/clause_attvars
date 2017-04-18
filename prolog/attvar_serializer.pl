@@ -11,8 +11,10 @@
 */
 % NEW
 :- module(attvar_serializer, [
+          deserialize_attvars/2,
           deserialize_attvars/2,deserialize_attvars/3,
           serialize_attvars/2,
+          serialize_attvars_now/2,
           put_dyn_attrs/2,
           ensure_named/3,
           verbatum_var/1,
@@ -25,7 +27,7 @@
 
 
 :- module_transparent((deserialize_attvars/2,deserialize_attvars/3,
-          serialize_attvars/2,
+          serialize_attvars_now/2,
           put_dyn_attrs/2,
           ensure_named/3,
           system_expanded_attvars/4,
@@ -135,22 +137,66 @@ system_expanded_attvars(M:term,P,I,CO):- nonvar(P),
    b_setval('$term',CO).
 
 
+free_of_attvars(Term):- term_attvars(Term,Vs),!,Vs==[].
+
+free_of_attrs(Term):- get_attrs(Term,Attrs),!,Attrs==[].
+free_of_attrs(Term):- term_attvars(Term,Vs),maplist(free_of_attrs,Vs).
 
 
 %% serialize_attvars( +AttvarTerm, -PrintableTerm) is semidet.
 %
-% serialize attributed variables (this is for printing only currently)
+% serialize attributed variables (this is for printing and term_expansions currently)
 %
-serialize_attvars(I,O):- verbatum_term(I),!,O=I.
-serialize_attvars(V,S):- var(V),must(serialize_1v(V,S)),!.
-serialize_attvars(C,A):- compound_name_arguments(C,F,Args),maplist(serialize_attvars,Args,OArgs),compound_name_arguments(A,F,OArgs).
+serialize_attvars(I,O):- serialize_attvars_now(I,O),sanity(ignore(show_failure(free_of_attvars(O)))),sanity(show_failure(free_of_attrs(O))).
+
+serialize_attvars_now(V,S):- var(V),must(serialize_1v(V,S)),!.
+serialize_attvars_now(I,O):- \+ compound(I),!,O=I.
+serialize_attvars_now(C,A):- compound_name_arguments(C,F,Args),maplist(serialize_attvars_now,Args,OArgs),compound_name_arguments(A,F,OArgs).
+
+
+serialize_attvar_term(I,O):- copy_term(I,O), serialize_attvar_term_now(O),
+   sanity(ignore(show_failure(free_of_attvars(O)))),
+   sanity(show_failure(free_of_attrs(O))).
+
+% ?- 
+% rtrace(( X = hi(T),put_attr(T,sk,foo),serialize_attvar_term(X,SS), sanity(\+  has_skolem_attrvars(SS)))).
+
+
+serialize_attvar_term_now(V):- attvar(V),trace_or_throw(serialize_attvar_term(V)).
+serialize_attvar_term_now(I):- \+ compound(I),!.
+serialize_attvar_term_now(C):- functor(C,_,A),serialize_attvar_term_now(A,C).
+
+serialize_attvar_term_now(0,_):-!.
+serialize_attvar_term_now(A,C):- arg(A,C,E),serialize_attvar_term_now(A,C,E),Am1 is A-1,serialize_attvar_term_now(Am1,C).
+
+serialize_attvar_term_now(A,C,E):- attvar(E),!,get_put_attr_serial(E,New),setarg(A,C,New),!.
+serialize_attvar_term_now(_,C,E):- compound(E)->serialize_attvar_term_now(C);true.
+
+get_put_attr_serial(E,New):- get_attr(E,'$$sv$$',New),!.
+get_put_attr_serial(E,Next):- serialize_3(E,Name,Atts),MyCopy =_, subst(Atts,E,MyCopy,NewAtts),Next=avar(Name,att('$linkval',MyCopy,NewAtts)),del_attrs(E),put_attr(E,'$$sv$$',Next),!.
 
 serialize_1v(V,'$VAR'(Name)):- get_attrs(V, att(vn, Name, [])),!.
-serialize_1v(V,avar('$VAR'(N),SO)):- get_attrs(V, S),variable_name_or_ref(V,N),!,put_attrs(TEMP,S),del_attr(TEMP,vn),!,get_attrs(TEMP, SO),!.
+serialize_1v(V,avar('$VAR'(N),SO)):- get_attrs(V, S),variable_name_or_ref(V,N),put_attrs(TEMP,S),
+   del_attr(TEMP,vn),!,remove_attrs(TEMP, SO),!.
 serialize_1v(V,'$VAR'(N)):-  variable_name_or_ref(V,N).
-serialize_1v(V,avar(S)):- get_attrs(V, S),!.
+serialize_1v(V,avar(S)):- remove_attrs(V, S),!.
 serialize_1v(V,V).
 
+
+serialize_3(V,N,Atts):- (get_var_name(V,N);variable_name_or_ref(V,N)),del_attr(V,vn),(get_attrs(V, Atts)->true;Atts=[]),!.
+
+
+remove_attrs(Var,Attrs):-get_attrs(Var,Attrs),!,remove_all_attrs(Var).
+remove_attrs(Var,Attrs):-copy_term(Var,Copy,Attrs),Copy=Var,remove_all_attrs(Var).
+
+% ?- rtrace(( X = hi(T),put_attr(T,sk,foo),serialize_attvar_term(X,SS), \+  has_skolem_attrvars(SS))).
+% ?- X = hi(T),put_attr(T,sk,foo),rtrace(serialize_attvars(X,SS)), \+  has_skolem_attrvars(SS).
+
+
+% ?- X = hi(T),put_attr(T,sk,foo),remove_all_attrs(T).
+
+remove_all_attrs(Var):- attvar(Var),del_attrs(Var), sanity( \+ attvar(Var)),!.
+remove_all_attrs(Term):- term_attvars(Term,Vars),maplist(remove_all_attvrs,Vars).
 
 %% verbatum_term(TermT) is semidet.
 %
