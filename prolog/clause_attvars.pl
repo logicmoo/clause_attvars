@@ -107,12 +107,18 @@ clause_attv(H0,BIn,Ref):-
 
 
 clausify_attributes(V,V):- \+ current_prolog_flag(assert_attvars,true),!.
+
+clausify_attributes(Data,THIS):- attvar(Data), clausify_attributes_helper(Data,THIS).
 clausify_attributes(V,V):- \+ compound(V),!.
-clausify_attributes(:-(V),:-(V)):-!.
+%clausify_attributes(:-(V),:-(V)):-!.
 clausify_attributes(M:Data,M:THIS):- !,clausify_attributes(Data,THIS).
 clausify_attributes([H|T],[HH|TT]):- !,clausify_attributes(H,HH),clausify_attributes(T,TT).
 %clausify_attributes((H,T),(HH,TT)):- !,clausify_attributes(H,HH),clausify_attributes(T,TT).
-clausify_attributes(Data,THIS):- copy_term(Data,DataC,Attribs),expand_to_hb(DataC,H,B),clausify_attributes4(H,B,Attribs,THIS).
+clausify_attributes(Data,THIS):- clausify_attributes_helper(Data,THIS).
+
+clausify_attributes_helper(Data,THIS):-  term_attvars(Data,Vars),Vars=[_|_],maplist(del_attr_type(vn),Vars),!,copy_term(Data,DataC,Attribs),expand_to_hb(DataC,H,B),clausify_attributes4(H,B,Attribs,THIS),!.
+clausify_attributes_helper(Data,Data).
+
 
 clausify_attributes4(H,B,[],(H:-B)):-!.
 clausify_attributes4(H,B,Extra,(H:-attr_bind(Extra,B))).

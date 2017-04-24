@@ -14,10 +14,11 @@
 :- set_module(class(library)).
 :- create_prolog_flag(assert_attvars,false,[keep(true)]).
 :- create_prolog_flag(read_attvars,false,[keep(true)]).
-:- module_transparent((
-          read_attvars/1,read_attvars/0)).
+:- module_transparent((read_attvars/1,read_attvars/0)).
 
-:- reexport(attvar_serializer).
+:- use_module(library(toplevel_variable_names)).
+:- use_module(library(attvar_serializer)).
+
 
 :- multifile(lmcache:use_attvar_expander/1).
 :- dynamic(lmcache:use_attvar_expander/1).
@@ -67,6 +68,19 @@ read_attvars(TF):-
   (TF==true->
      install_attvar_expander(M);
      uninstall_attvar_expander(M)).
+
+
+
+user:expand_query(Goal, Expanded, Bindings, ExpandedBindings):- fail,
+      prolog_load_context(module,LC),
+      \+ lmcache:never_use_attvar_expander(LC),
+      current_prolog_flag(read_attvars,true),
+      \+ current_prolog_flag(read_attvars_toplevel,false),
+      \+ current_prolog_flag(xref,true), 
+      Struct= ['$variable_names'|Bindings],
+      deserialize_attvars(Struct,Goal,Expanded),
+      [_|ExpandedBindings] = Struct.
+
 
 :- fixup_exports.
 
