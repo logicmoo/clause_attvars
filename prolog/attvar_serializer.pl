@@ -23,10 +23,6 @@
 
 :- set_module(class(library)).
 
-:- set_prolog_flag(verbose_autoload,true).
-:- set_prolog_flag(verbose_load,full).
-:- debug.
-
 :- module_transparent((deserialize_attvars/2,deserialize_attvars/3,
           serialize_attvars_now/2,
           put_dyn_attrs/2,
