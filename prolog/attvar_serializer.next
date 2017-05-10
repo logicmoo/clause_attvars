@@ -75,6 +75,8 @@ maybe_must(_).
 
 
 % deserialize_attvars(V,O):- get_varname_list(Vs),!,loop_check(deserialize_attvars(['$variable_names'|Vs], V,O)),!.
+
+deserialize_attvars(V,O):-nonvar(O),!,deserialize_attvars(V,OO),ignore(O=OO).
 deserialize_attvars(V,O):- \+compound(V),!,O=V.
 deserialize_attvars(V,O):- loop_check(deserialize_attvars([localvs], V,O),V=O),!.
 
