@@ -1,3 +1,5 @@
+:- module(attvar_reader, [read_attvars/1,read_attvars/0,install_attvar_expander/1,uninstall_attvar_expander/1]).
+:- set_module(class(library)).
 /*  Logicmoo Debug Tools
 % ===================================================================
 % File 'logicmoo_util_varnames.pl'
@@ -9,9 +11,6 @@
 % Revised At:  $Date: 2002/07/11 21:57:28 $
 % ===================================================================
 */
-% NEW
-:- module(attvar_reader, [read_attvars/1,read_attvars/0,install_attvar_expander/1,uninstall_attvar_expander/1]).
-:- set_module(class(library)).
 :- create_prolog_flag(assert_attvars,false,[keep(true)]).
 :- create_prolog_flag(read_attvars,false,[keep(true)]).
 :- module_transparent((read_attvars/1,read_attvars/0)).
@@ -61,9 +60,10 @@ uninstall_attvar_expander(_):-set_prolog_flag(read_attvars,false).
   
 
 read_attvars:- read_attvars(true).
+
 read_attvars(TF):- 
   set_prolog_flag(read_attvars,TF),
-  set_prolog_flag(assert_attvars,TF),
+%  set_prolog_flag(assert_attvars,TF),
   prolog_load_context(module,M),
   (TF==true->
      install_attvar_expander(M);

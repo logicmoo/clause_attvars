@@ -66,7 +66,8 @@ attr_bind(Attribs,Call):-maplist(call,Attribs),Call.
 
 
 clause_attv(H,B,R):- nonvar(R),!, 
-  dont_make_cyclic((must(system:clause(H0,BC,R)),must(split_attrs(BC,AV,B0)),!,must((AV,!,B=B0,H=H0)))).
+  dont_make_cyclic((must(system:clause(H0,BC,R)),
+    must(split_attrs(BC,AV,B0)),!,must((AV,!,B=B0,H=H0)))).
 
 clause_attv(H0,B0,Ref):-
  copy_term(H0:B0, H:B, Attribs),
@@ -76,7 +77,7 @@ clause_attv(H0,B0,Ref):-
         maplist(call,Attribs))))).
 
 
- unify_bodies(B,B):-!.
+unify_bodies(B,B):-!.
 unify_bodies(B1,B2):-strip_module(B1,_,BB1),strip_module(B2,_,BB2),!,BB1=BB2.
 
 /*

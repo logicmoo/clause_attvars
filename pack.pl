@@ -9,4 +9,4 @@ packager( 'TeamSPoon/LogicMoo', 'https://github.com/TeamSPoon/' ).
 maintainer( 'TeamSPoon', 'https://github.com/TeamSPoon/' ).
 home('https://github.com/TeamSPoon/clause_attvars').
 requires(dictoo).
-autoload(false).
+autoload(true).
