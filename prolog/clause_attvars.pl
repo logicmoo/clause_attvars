@@ -68,17 +68,25 @@ attr_bind(Attribs,Call):- attr_bind(Attribs),Call.
 clause_attv(H,B,R):- nonvar(R),!, 
   dont_make_cyclic((must(system:clause(H0,BC,R)),
     must(split_attrs(BC,AV,B0)),!,
-    must((catch(AV,error(uninstantiation_error(_),_),fail),!,B=B0,H=H0)))).
+    must((catch(AV,error(uninstantiation_error(_),_),fail),!,unify_bodies(B0,B),H=H0)))).
+
+clause_attv(M:H0,B0,Ref):- !,
+ notrace(copy_term(H0:B0, H:B, Attribs)),
+ dont_make_cyclic((    
+    (M:clause(H,BC,Ref),
+       split_attrs(BC,AV,BB), unify_bodies(B,BB) , AV , unify_bodies(H0,H),unify_bodies(B0,B),
+        attr_bind(Attribs)))).
 
 clause_attv(H0,B0,Ref):-
- copy_term(H0:B0, H:B, Attribs),
+ notrace(copy_term(H0:B0, H:B, Attribs)),
  dont_make_cyclic((    
-    (system:clause(H,BC,Ref) *-> 
-      must(split_attrs(BC,AV,BB)) -> unify_bodies(B,BB) -> AV -> (H0=H,B0=B,
-        attr_bind(Attribs))))).
+    (clause(H,BC,Ref),
+       split_attrs(BC,AV,BB), unify_bodies(B,BB) , AV , unify_bodies(H0,H),unify_bodies(B0,B),
+        attr_bind(Attribs)))).
 
-unify_bodies(B,B):-!.
-unify_bodies(B1,B2):-strip_module(B1,_,BB1),strip_module(B2,_,BB2),!,BB1=BB2.
+unify_bodies(B1,B2):-strip_module(B1,M1,BB1),strip_module(B2,M2,BB2),(B2\==BB2;B1\==BB1),!,M1=M2,unify_bodies(BB1,BB2).
+unify_bodies(B1,B2):- (\+ compound(B1);\+ compound(B2)),!,B1=B2.
+unify_bodies(B1,B2):- B1=..[F|BB1],B2=..[F|BB2],context_module(M),maplist(M:unify_bodies,BB1,BB2).
 
 /*
 
