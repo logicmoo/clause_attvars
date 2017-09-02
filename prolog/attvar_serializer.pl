@@ -149,8 +149,8 @@ system_expanded_attvars(M:term,P,I,CO):- nonvar(P), compound(I), I\= (:-(_)),
    
 free_of_attvars(Term):- term_attvars(Term,Vs),!,Vs==[].
 
-free_of_attrs(Term):- get_attrs(Term,Attrs),!,Attrs==[].
-free_of_attrs(Term):- term_attvars(Term,Vs),maplist(free_of_attrs,Vs).
+free_of_attrs(Term):- var(Term),!,(get_attrs(Term,Attrs)-> Attrs==[] ; true).
+free_of_attrs(Term):- term_attvars(Term,Vs),!,(Vs==[]->true;maplist(free_of_attrs,Vs)).
 
 
 %% serialize_attvars( +AttvarTerm, -PrintableTerm) is semidet.
