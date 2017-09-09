@@ -71,14 +71,14 @@ clause_attv(H,B,R):- nonvar(R),!,
     must((catch(AV,error(uninstantiation_error(_),_),fail),!,unify_bodies(B0,B),H=H0)))).
 
 clause_attv(M:H0,B0,Ref):- !,
- notrace(copy_term(H0:B0, H:B, Attribs)),
+ quietly(copy_term(H0:B0, H:B, Attribs)),
  dont_make_cyclic((    
     (M:clause(H,BC,Ref),
        split_attrs(BC,AV,BB), unify_bodies(B,BB) , AV , unify_bodies(H0,H),unify_bodies(B0,B),
         attr_bind(Attribs)))).
 
 clause_attv(H0,B0,Ref):-
- notrace(copy_term(H0:B0, H:B, Attribs)),
+ quietly(copy_term(H0:B0, H:B, Attribs)),
  dont_make_cyclic((    
     (clause(H,BC,Ref),
        split_attrs(BC,AV,BB), unify_bodies(B,BB) , AV , unify_bodies(H0,H),unify_bodies(B0,B),
@@ -109,7 +109,7 @@ clause_attv(MH,B,Ref):- !,
 clause_attv(H0,BIn,Ref):- 
     copy_term_nat(H0:BIn,H:B0),
     system:clause(H,BC,Ref),
-  (must(notrace(split_attrs(BC,AV,B))) -> ( B=B0 -> AV -> H=H0 -> BIn=B)).
+  (must(quietly(split_attrs(BC,AV,B))) -> ( B=B0 -> AV -> H=H0 -> BIn=B)).
 */
 % clause_attv(H00,B000,Ref):- unnumbervars((H00:B000),(H:B0)), split_attrs(B0,_A,B),!,clause_i(H,B,Ref), (clause_i(HH,BB,Ref),HH=@=H,BB=@=B,A).
 % clause_attv(H,B,Ref):- system:clause(H,AB,Ref), (must(split_attrs(AB,A,B0)->A),B=B0).

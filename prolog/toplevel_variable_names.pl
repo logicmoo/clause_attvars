@@ -4,7 +4,7 @@
 
 user:expand_query(Goal, Expanded, Bindings, ExpandedBindings):-    
     % Have vars to expand and varnames are empty
-    notrace((Bindings\==[],prolog_load_context(variable_names,Vs), Vs ==[])),
+    quietly((Bindings\==[],prolog_load_context(variable_names,Vs), Vs ==[])),
     b_setval('$variable_names', Bindings),  % this prevents the loop
     debug(expand_query,'~q',[b_setval('$variable_names', Bindings)]),
     (toplevel_variables:expand_query(Goal, Expanded0, Bindings, ExpandedBindings0) -> true; 

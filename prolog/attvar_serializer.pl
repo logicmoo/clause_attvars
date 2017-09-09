@@ -76,7 +76,7 @@ find_or_create_named_var(Vs,N,V):-  find_named_var(How,Vs,N,V),
    % (member(localvs,Vs)->put_attr(V,vn,N);true),!.
 find_or_create_named_var(Vs,N,V):- var(N),variable_name(N,Name), put_into_list(Vs,N,V), put_into_list(Vs,Name,V),!.
 find_or_create_named_var(Vs,N,V):- variable_name(V,Name), put_into_list(Vs,N,V), put_into_list(Vs,Name,V),!.
-find_or_create_named_var(Vs,N,V):- put_into_list(Vs,N,V),!,(member('$variable_names',Vs)->notrace(add_var_to_env(N,V);true)).
+find_or_create_named_var(Vs,N,V):- put_into_list(Vs,N,V),!,(member('$variable_names',Vs)->quietly(add_var_to_env(N,V);true)).
 
 
 deserialize_attvars(V,O):- \+compound(V),!,O=V.
