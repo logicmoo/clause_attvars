@@ -39,7 +39,7 @@
 
 lmcache:never_use_attvar_expander(attvar_serializer).
 
-:- use_module(library(dictoo)).
+:- use_module(library(gvar_lib)).
 %:- reexport(library(hook_database)).
 %:- reexport(library(listing_vars)).
 
